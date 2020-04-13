@@ -19,17 +19,23 @@ namespace Epidemic_Models {
         }
 
         private OdeExplicitRungeKutta45 odeRK = new OdeExplicitRungeKutta45();
-        double[] yprime = new double[3];
-
+        double[] yprime = new double[4];
+        double beta = 10;    //time between contacts ^-1
+        double gamma = 0.1;   //time until recovery ^-1
+        double lambda = 0.01;  //birth rate
+        double mu = 0.01;      //death rate
+        double a = 3;       //incubation period
+        int N = 100;
 
         private double[,] Solve() {
             OdeFunction fun = new OdeFunction(ODEs);
-            double[] y0 = new double[3];
-            y0[0] = 0;
-            y0[1] = 1;
-            y0[2] = 1;
-            odeRK.InitializeODEs(fun, 3);
-            double[,] sol = odeRK.Solve(y0, 0, 0.003, 15);
+            double[] initialConditions = new double[4];
+            initialConditions[0] = N;
+            initialConditions[1] = 0;
+            initialConditions[2] = 1;
+            initialConditions[3] = 0;
+            odeRK.InitializeODEs(fun, 4);
+            double[,] sol = odeRK.Solve(initialConditions, 0, 0.003, 50);
 
 
             /* for (int i = 0; i < sol.GetLength(0); i++) {
@@ -44,32 +50,35 @@ namespace Epidemic_Models {
             return sol;
         }
 
-        private double[] ODEs(double t, double[] y) {
-            double sigma = 10, r = 99.96, b = 10 / 3;
-            // tutaj som rownania do attractora lorentza
-            yprime[0] = sigma * (y[1] - y[0]);
-            yprime[1] = -y[0] * y[2] + r * y[0] - y[1];
-            yprime[2] = y[0] * y[1] - b * y[2];
+        private double[] ODEs(double t,double[] y) {
+            yprime[0] = lambda - mu *  y[0] - beta * y[2] * y[0] / N;
+            yprime[1] = beta * y[2] * y[0] / N - (mu + a) * y[1];
+            yprime[2] = a * y[1] - (gamma + mu) * y[2];
+            yprime[3] = gamma * y[2] - mu * y[3];
             return yprime;
         }
 
         private void MakeAPlot(double[,] data) {
             var plt = new ScottPlot.Plot(1000, 800);
-            double[] x, y;
+            double[] x, y1, y2, y3, y4;
             int linewidth = 2, markersize = 0;
 
             double[] t = GetColumn(data, 0);
             Console.WriteLine("t0:" + t[0]);
-            x = GetColumn(data, 1);
-            y = GetColumn(data, 3);
-            plt.Title("Jakis fajny tutulik :)");
+            x = GetColumn(data, 0);
+            y1 = GetColumn(data, 1);
+            y2 = GetColumn(data, 2);
+            y3 = GetColumn(data, 3);
+            y4 = GetColumn(data, 4);
 
-            plt.PlotScatter(x, y, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Red, label: "jakas fajna legenda");
+            plt.PlotScatter(x, y1, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Green, label: "Healthy");
+            plt.PlotScatter(x, y2, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Orange, label: "Exposed");
+            plt.PlotScatter(x, y3, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Red, label: "Infected");
+            plt.PlotScatter(x, y4, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Blue, label: "Recovered");
+            plt.PlotAnnotation("Population: " + N + "\nβ = " + beta + "\nγ = " + gamma + "\nΛ = " + lambda + "\nμ = " + mu + "\na = " + a, 10, 10);
             plt.Legend();
-
-
-            plt.YLabel("y");
-            plt.XLabel("x");
+            plt.XLabel("Time");
+            plt.YLabel("Population");
 
             image.Source = CreateBitmapSourceFromGdiBitmap(plt.GetBitmap());
         }
