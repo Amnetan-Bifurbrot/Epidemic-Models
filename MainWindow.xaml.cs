@@ -14,25 +14,27 @@ namespace Epidemic_Models {
     public partial class MainWindow : Window {
         public MainWindow() {
             InitializeComponent();
+            
         }
 
         private OdeExplicitRungeKutta45 odeRK = new OdeExplicitRungeKutta45();
         double[] yprime = new double[3];
         double beta = 10;    //time between contacts ^-1
         double gamma = 0.1;   //time until recovery ^-1
-        double lambda = 0.01;  //birth rate
-        double mu = 0.01;      //death rate
-        double a = 3;       //incubation period
+        //double lambda = 0.01;  //birth rate
+        //double mu = 0.01;      //death rate
+        //double a = 3;       //incubation period
         int N = 100;
+        Graph<int> graph = new Graph<int>(false, false);
+        Node<int>[] nodes;
+
         private double[,] Solve() {
             OdeFunction fun = new OdeFunction(ODEs);
             double[] initialConditions;
             double[,] sol;
             // S + I + R = N !!!!!!!!!!!!!!!
-
-
             initialConditions = new double[3];
-            initialConditions[0] = N;
+            initialConditions[0] = N - 1;
             initialConditions[1] = 1;
             initialConditions[2] = 0;
             odeRK.InitializeODEs(fun, 3);
@@ -52,7 +54,7 @@ namespace Epidemic_Models {
 
         private void MakeAPlot(double[,] data) {
             var plt = new ScottPlot.Plot(1000, 800);
-            double[] x, y1, y2, y3, y4;
+            double[] x, y1, y2, y3;
             int linewidth = 2, markersize = 0;
 
             x = GetColumn(data, 0);
@@ -111,6 +113,7 @@ namespace Epidemic_Models {
         private void Button_Click(object sender, RoutedEventArgs e) {
             MakeAPlot(Solve());
 
+            CreateRandomGraph();
 
         }
     }
