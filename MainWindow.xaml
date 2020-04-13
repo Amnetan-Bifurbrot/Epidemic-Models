@@ -14,8 +14,6 @@
         </Menu>
         <DockPanel Margin="0,0,0,670">
             <RadioButton x:Name="sirBtn" Content="SIR" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="50,30,0,0" IsChecked="True"/>
-            <RadioButton x:Name="sisBtn" Content="SIS" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="50,30,0,0" IsChecked="False"/>
-            <RadioButton x:Name="seirBtn" Content="SEIR" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="50,30,0,0" IsChecked="False"/>
             <Button x:Name="goBtn" Content="Go!" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="600,30,0,0" Width="80" Click="Button_Click"/>
         </DockPanel>
         <Canvas x:Name="canvas" Margin="30,70,30,30" RenderTransformOrigin="0,0">
