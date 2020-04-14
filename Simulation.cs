@@ -4,9 +4,9 @@ using System.Windows;
 namespace Epidemic_Models {
     public partial class MainWindow : Window {
         // funkcja wywolana jest w Button_Click
-        private void CreateRandomGraph() {
+        /*private void CreateRandomGraph() {
             Random rand = new Random();
-            int n = Int32.Parse(NTb.Text);
+            int n = Int32.Parse(NTb.Text), max = 5;
             Console.WriteLine("n: " + n);
             nodes = new Node<int>[n];
 
@@ -15,8 +15,8 @@ namespace Epidemic_Models {
                 nodes[k] = graph.AddNode(k);              
             }
 
-           // int contacts = Int32.Parse(cTb.Text);
-            
+            // int contacts = Int32.Parse(cTb.Text);
+
 
             // masakrejsyn, tego fragmentu kodu nikt nie powinien widziec na oczenta
             /*for (int i = 0; i < n; i++) {
@@ -41,9 +41,22 @@ namespace Epidemic_Models {
                   
                 }
                 Console.WriteLine("Counter: " + a);
-            }*/
+            }
 
-            //do pstwa - z tym ze Adam mufi ze njeeee
+            
+
+            for (int i = 0; i < n; i++) {       //oj Zuze Zuze
+                int N = nodes[i].Neighbours.Count;
+                if (nodes[i].Neighbours.Count < max + 1 - N) {
+                    for (int j = 0; j < max - N; j++) {
+                        int r = rand.Next(n);
+                        Edge<int> newEdge = new Edge<int>(nodes[i], nodes[r]);
+                        if (!graph.GetEdges().Contains(newEdge) && nodes[r].Neighbours.Count < max) {
+                            graph.AddEdge(nodes[i], nodes[r]);
+                        }
+                    }
+                }
+            }
 
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
@@ -54,14 +67,12 @@ namespace Epidemic_Models {
                     }
                 }
             }
-
+           
             // wypisuje co kto ile ma krawedzi
             for (int l = 0; l < n; l++) {
                 Console.WriteLine(nodes[l].ToString());
             }
-           
-        }
-
+        }*/
     }
 }
 

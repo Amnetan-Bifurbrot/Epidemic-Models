@@ -1,5 +1,6 @@
 ﻿using DotNumerics.ODE;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
@@ -15,18 +16,33 @@ namespace Epidemic_Models {
         public MainWindow() {
             InitializeComponent();
             
+            nodes = new List<Node<Hooman>>();
+            
+            
+            for (int i = 0; i < N; i++) {
+                Node<Hooman> healthy = new Node<Hooman>();
+                healthy.Data = new Hooman(true, false, false);
+                nodes.Add(healthy);
+            }
+
+            Node<Hooman> infected = new Node<Hooman>();
+            infected.Data = new Hooman(false, true, false);
+            nodes.Add(infected);
+            graph.Nodes = nodes;
+            graph.generateRandomEdges(nodes, maxNeighbors);
+            Hooman.society = graph;
         }
 
         private OdeExplicitRungeKutta45 odeRK = new OdeExplicitRungeKutta45();
         double[] yprime = new double[3];
-        double beta = 10;    //time between contacts ^-1
-        double gamma = 0.1;   //time until recovery ^-1
+        double beta = 1;    //time between contacts ^-1
+        double gamma = 1;   //time until recovery ^-1
         //double lambda = 0.01;  //birth rate
         //double mu = 0.01;      //death rate
         //double a = 3;       //incubation period
-        int N = 100;
-        Graph<int> graph = new Graph<int>(false, false);
-        Node<int>[] nodes;
+        int N = 100, maxNeighbors = 5;
+        Graph<Hooman> graph = new Graph<Hooman>(false, false);
+        List<Node<Hooman>> nodes;
 
         private double[,] Solve() {
             OdeFunction fun = new OdeFunction(ODEs);
@@ -54,17 +70,26 @@ namespace Epidemic_Models {
 
         private void MakeAPlot(double[,] data) {
             var plt = new ScottPlot.Plot(1000, 800);
-            double[] x, y1, y2, y3;
+            double[] x, y1, y2, y3, empX, empY1, empY2, empY3;
             int linewidth = 2, markersize = 0;
 
             x = GetColumn(data, 0);
-
             y1 = GetColumn(data, 1);
             y2 = GetColumn(data, 2);
             y3 = GetColumn(data, 3);
-            plt.PlotScatter(x, y1, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Green, label: "Susceptible");
-            plt.PlotScatter(x, y2, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Red, label: "Infected");
-            plt.PlotScatter(x, y3, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Blue, label: "Recovered");
+
+            empX = Hooman.graphdata[0];
+            empY1 = Hooman.graphdata[1];
+            empY2 = Hooman.graphdata[2];
+            empY3 = Hooman.graphdata[3];
+            //plt.PlotScatter(x, y1, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Green, label: "Susceptible");
+            //plt.PlotScatter(x, y2, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Red, label: "Infected");
+            //plt.PlotScatter(x, y3, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Blue, label: "Recovered");
+
+            plt.PlotScatter(empX, empY1, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Green, label: "Susceptible emp");
+            plt.PlotScatter(empX, empY2, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Red, label: "Infected emp");
+            plt.PlotScatter(empX, empY3, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Blue, label: "Recovered emp");
+
 
             plt.PlotAnnotation("Population: " + N + "\nβ = " + beta + "\nγ = " + gamma, 10, 10);
             plt.Legend();
@@ -111,10 +136,8 @@ namespace Epidemic_Models {
         }
 
         private void Button_Click(object sender, RoutedEventArgs e) {
+            Hooman.SpreadDisease(beta, gamma, 15);
             MakeAPlot(Solve());
-
-            CreateRandomGraph();
-
         }
     }
 }

@@ -40,7 +40,7 @@ namespace Epidemic_Models {
             return node;
         }
 
-        public void  AddEdge(Node<T> from, Node<T> to, int weight = 0) {
+        public void AddEdge(Node<T> from, Node<T> to, int weight = 0) {
             from.Neighbours.Add(to);
             if (_isWeighted) {
                 from.Weights.Add(weight);
@@ -50,9 +50,9 @@ namespace Epidemic_Models {
                 if (_isWeighted) {
                     to.Weights.Add(weight);
                 }
-
             }
         }
+
         public void RemoveNode(Node<T> nodeToRemove) {
             Nodes.Remove(nodeToRemove);
             UpdateIndices();
@@ -60,6 +60,7 @@ namespace Epidemic_Models {
                 RemoveEdge(node, nodeToRemove);
             }
         }
+
         public void RemoveEdge(Node<T> from, Node<T> to) {
             int index = from.Neighbours.FindIndex(n => n == to);
             if(index >= 0) {
@@ -84,9 +85,27 @@ namespace Epidemic_Models {
             }
             return edges;
         }
+
         private void UpdateIndices() {// przechodzi przez wszystkie wezly i zmienia walsciwosci Index na kolejen liczby zaczynajac od 0
             int i = 0;
             Nodes.ForEach(n => n.Index = i++);
+        }
+
+        public void generateRandomEdges(List<Node<T>> nodes, int max) {
+            Random rand = new Random();
+            int n = nodes.Count;
+            for (int i = 0; i < n; i++) {
+                int N = nodes[i].Neighbours.Count;
+                if (nodes[i].Neighbours.Count < max + 1 - N) {
+                    for (int j = 0; j < max - N; j++) {
+                        int r = rand.Next(n);
+                        Edge<T> newEdge = new Edge<T>(nodes[i], nodes[r]);
+                        if (!this.GetEdges().Contains(newEdge) && nodes[r].Neighbours.Count < max) {
+                            this.AddEdge(nodes[i], nodes[r]);
+                        }
+                    }
+                }
+            }
         }
     }
 }

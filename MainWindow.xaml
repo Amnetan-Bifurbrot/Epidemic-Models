@@ -16,8 +16,6 @@
             <RadioButton x:Name="sirBtn" Content="SIR" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="50,30,0,0" IsChecked="True"/>
             <Label Content="Population: " HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="300,30,0,0"/>
             <TextBox x:Name="NTb"  HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="10,30,0,0" Width="46" Text="100" Height="24"/>
-            <Label Content="Probability (random graph) " HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="20,30,0,0"/>
-            <TextBox x:Name="pTb"  HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="10,30,0,0" Width="46" Text="0,001" Height="24"/>
             <Button x:Name="goBtn" Content="Go!" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="100,30,0,0" Width="80" Click="Button_Click"/>
         </DockPanel>
         <Canvas x:Name="canvas" Margin="30,70,30,30" RenderTransformOrigin="0,0">
