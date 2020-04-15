@@ -18,7 +18,6 @@
 			for (int i = 0; i < howLong; i++) {
 				foreach (Node<Hooman> hooman in society.Nodes) {
 					if (hooman.Data.isInfected) {
-						System.Console.WriteLine("this boi is infected: " + hooman.Index);
 						hooman.Data.contactCounter++;
 						if (hooman.Data.contactCounter > contactTime) {
 							hooman.Data.contactCounter = 0;

@@ -15,32 +15,17 @@ namespace Epidemic_Models {
     public partial class MainWindow : Window {
         public MainWindow() {
             InitializeComponent();
-            
-            nodes = new List<Node<Hooman>>();
-            
-            
-            for (int i = 0; i < N; i++) {
-                Node<Hooman> healthy = new Node<Hooman>();
-                healthy.Data = new Hooman(true, false, false);
-                nodes.Add(healthy);
-            }
 
-            Node<Hooman> infected = new Node<Hooman>();
-            infected.Data = new Hooman(false, true, false);
-            nodes.Add(infected);
-            graph.Nodes = nodes;
-            graph.generateRandomEdges(nodes, maxNeighbors);
-            Hooman.society = graph;
         }
 
         private OdeExplicitRungeKutta45 odeRK = new OdeExplicitRungeKutta45();
         double[] yprime = new double[3];
-        double beta = 1;    //time between contacts ^-1
-        double gamma = 1;   //time until recovery ^-1
+        double beta = 0.7;    //time between contacts ^-1
+        double gamma = 0.5;   //time until recovery ^-1
         //double lambda = 0.01;  //birth rate
         //double mu = 0.01;      //death rate
         //double a = 3;       //incubation period
-        int N = 100, maxNeighbors = 5;
+        int N = 1000, maxNeighbors = 5;
         Graph<Hooman> graph = new Graph<Hooman>(false, false);
         List<Node<Hooman>> nodes;
 
@@ -54,7 +39,7 @@ namespace Epidemic_Models {
             initialConditions[1] = 1;
             initialConditions[2] = 0;
             odeRK.InitializeODEs(fun, 3);
-            sol = odeRK.Solve(initialConditions, 0, 0.03, 10);
+            sol = odeRK.Solve(initialConditions, 0, 0.03, 20);
 
             return sol;
         }
@@ -136,6 +121,25 @@ namespace Epidemic_Models {
         }
 
         private void Button_Click(object sender, RoutedEventArgs e) {
+            N = int.Parse(NTb.Text);
+
+            nodes = new List<Node<Hooman>>();
+            for (int i = 0; i < N; i++) {
+                Node<Hooman> healthy = new Node<Hooman>();
+                healthy.Data = new Hooman(true, false, false);
+                nodes.Add(healthy);
+            }
+
+            Node<Hooman> infected = new Node<Hooman>();
+            infected.Data = new Hooman(false, true, false);
+            nodes.Add(infected);
+            graph.Nodes = nodes;
+            graph.generateRandomEdges(nodes, maxNeighbors);
+            Hooman.society = graph;
+
+            beta = Double.Parse(betaTb.Text);
+            gamma = Double.Parse(gammaTb.Text);
+
             Hooman.SpreadDisease(beta, gamma, 15);
             MakeAPlot(Solve());
         }
