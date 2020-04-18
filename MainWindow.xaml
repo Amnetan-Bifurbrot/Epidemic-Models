@@ -14,9 +14,9 @@
         </Menu>
         <Grid Margin="0,0,-0.4,650.4">
             <Label Content="Population: " HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="20,35,0,0"/>
-            <Label Content="Healthy: " HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="100,27,0,0"/>
+            <Label Content="All:" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="100,27,0,0"/>
             <Label Content="Infected: " HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="100,50,0,0"/>
-            <TextBox x:Name="NTb"  HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="180,30,0,0" Width="46" Text="100" Height="19" RenderTransformOrigin="-4.726,1.025" MaxLines="1" IsUndoEnabled="True"/>
+            <TextBox x:Name="NTb"  HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="180,30,0,0" Width="46" Text="100" Height="19" RenderTransformOrigin="-4.726,1.025" MaxLines="1" IsUndoEnabled="True" TextChanged="NTb_TextChanged"/>
             <TextBox x:Name="infectedNTb"  HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="180,52,0,0" Width="46" Text="1" Height="19" RenderTransformOrigin="-4.726,1.025" MaxLines="1" IsUndoEnabled="True"/>
             <Label Content="β: " HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="260,35,0,0"/>
             <TextBox x:Name="betaTb"  HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="300,35,0,0" Width="46" Text="1" Height="24"/>

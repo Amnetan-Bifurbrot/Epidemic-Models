@@ -1,28 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Epidemic_Models {
     public class Graph<T> {
 
         private bool _isDirected = false;
         private bool _isWeighted = false;
-        public List<Node<T>> Nodes { get; set; } = new List<Node<T>>(); 
+        public List<Node<T>> Nodes { get; set; } = new List<Node<T>>();
 
         public Graph(bool isDirected, bool isWeighted) {
             _isDirected = isDirected;
             _isWeighted = isWeighted;
         }
-        
+
         public Edge<T> this[int from, int to] {     //indeksator - pobiera instancje klasy Node (nodeFrom i nodeTo) i znajduje krawędz
             get {
                 Node<T> nodeFrom = Nodes[from];
                 Node<T> nodeTo = Nodes[to];
                 int i = nodeFrom.Neighbours.IndexOf(nodeTo);
-                if(i >= 0) {
-                    Edge<T> edge = new Edge<T>() { 
+                if (i >= 0) {
+                    Edge<T> edge = new Edge<T>() {
                         From = nodeFrom,
                         To = nodeTo,
                         Weight = i < nodeFrom.Weights.Count ? nodeFrom.Weights[i] : 0
@@ -33,7 +30,7 @@ namespace Epidemic_Models {
                 return null;
             }
         }
-         public Node<T> AddNode(T value) {      
+        public Node<T> AddNode(T value) {
             Node<T> node = new Node<T>() { Data = value };
             Nodes.Add(node);
             UpdateIndices();
@@ -54,7 +51,7 @@ namespace Epidemic_Models {
         }
 
         public void RemoveNode(Node<T> nodeToRemove) {
-            foreach(Node<T> node in Nodes) {
+            foreach (Node<T> node in Nodes) {
                 RemoveEdge(node, nodeToRemove);
             }
             Nodes.Remove(nodeToRemove);
@@ -63,7 +60,7 @@ namespace Epidemic_Models {
 
         public void RemoveEdge(Node<T> from, Node<T> to) {
             int index = from.Neighbours.FindIndex(n => n == to);
-            if(index >= 0) {
+            if (index >= 0) {
                 from.Neighbours.RemoveAt(index);
                 if (_isWeighted) {
                     from.Weights.RemoveAt(index);
@@ -95,9 +92,7 @@ namespace Epidemic_Models {
             AddNode(value);
             Random rand = new Random();
             for (int i = 0; i < maxDegree; i++) {
-                Console.WriteLine(Nodes.Count);
                 int r = rand.Next(Nodes.Count - 1);
-                Console.WriteLine(r);
                 AddEdge(Nodes[Nodes.Count - 1], Nodes[r]);
             }
         }
@@ -110,11 +105,11 @@ namespace Epidemic_Models {
             bool[][] matrix = new bool[n][];
             for (int a = 0; a < n; a++) matrix[a] = new bool[n];
 
-            for(int i = 0; i < n - 1; i++) {
+            for (int i = 0; i < n - 1; i++) {
                 if (neighbors[i] < maxDegree) {
                     for (int j = 0; j < maxDegree - neighbors[i]; j++) {
                         r = rand.Next(i + 1, n);
-                        if(neighbors[r] < maxDegree) {
+                        if (neighbors[r] < maxDegree) {
                             matrix[i][r] = matrix[r][i] = true;
                             neighbors[i] += 1;
                             neighbors[r] += 1;
@@ -124,8 +119,8 @@ namespace Epidemic_Models {
             }
 
             //teraz ich połączmy
-            for(int i = 0; i < n; i++) {
-                for(int j = 0; j < i; j++) {
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < i; j++) {
                     if (matrix[i][j]) {
                         this.AddEdge(this.Nodes[i], this.Nodes[j]);
                     }
