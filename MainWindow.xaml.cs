@@ -142,7 +142,7 @@ namespace Epidemic_Models {
 
             beta = Double.Parse(betaTb.Text);
             gamma = Double.Parse(gammaTb.Text);
-
+             
             Hooman.SpreadDisease(beta, gamma, lambda, mu, xi, 50, N / 20);
             MakeAPlot(Solve());
 
