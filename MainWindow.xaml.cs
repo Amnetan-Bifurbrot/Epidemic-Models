@@ -1,9 +1,9 @@
 ﻿using DotNumerics.ODE;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -22,10 +22,10 @@ namespace Epidemic_Models {
         double[] yprime = new double[3];
         double beta = 0.7;    //time between contacts ^-1
         double gamma = 0.5;   //time until recovery ^-1
-        //double lambda = 0.01;  //birth rate
-        //double mu = 0.01;      //death rate
+        double lambda = 0.01;  //birth rate
+        double mu = 0.05;      //death rate
         //double a = 3;       //incubation period
-        int maxNeighbors = 5, N = 100, infectedN = 1;
+        int N = 100, infectedN = 1;
         Graph<Hooman> graph = new Graph<Hooman>(false, false);
 
         private double[,] Solve() {
@@ -120,25 +120,26 @@ namespace Epidemic_Models {
         }
 
         private void Button_Click(object sender, RoutedEventArgs e) {
-            graph.Nodes.Clear();
-            N = int.Parse(NTb.Text);
-            infectedN = int.Parse(infectedNTb.Text);
+                graph.Nodes.Clear();
+                N = int.Parse(NTb.Text);
+                infectedN = int.Parse(infectedNTb.Text);
 
-            for (int i = 0; i < N; i++) {   //zdrowe ludzie
-                graph.AddNode(new Hooman());
-            }
-            for (int i = 0; i < infectedN; i++) {   //chore ludzie
-                graph.AddNode(new Hooman(false, true, false));
-            }
+                for (int i = 0; i < N; i++) {   //zdrowe ludzie
+                    graph.AddNode(new Hooman());
+                }
+                for (int i = 0; i < infectedN; i++) {   //chore ludzie
+                    graph.AddNode(new Hooman(false, true, false));
+                }
 
-            graph.generateRandomEdges(graph.Nodes, maxNeighbors);
-            Hooman.society = graph;
+                graph.GenerateRandomEdges(N / 20);
+                Hooman.society = graph;
 
-            beta = Double.Parse(betaTb.Text);
-            gamma = Double.Parse(gammaTb.Text);
+                beta = Double.Parse(betaTb.Text);
+                gamma = Double.Parse(gammaTb.Text);
 
-            Hooman.SpreadDisease(beta, gamma, 15);
-            MakeAPlot(Solve());
-        }
+                Hooman.SpreadDisease(beta, gamma, lambda, mu, 100, N/20);
+                MakeAPlot(Solve());
+
+         }
     }
 }

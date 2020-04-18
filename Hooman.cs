@@ -1,4 +1,6 @@
-﻿namespace Epidemic_Models {
+﻿using System;
+
+namespace Epidemic_Models {
 	class Hooman {
 		public bool isSusceptible, isInfected, isRecovered;
 		int recoveryCounter = 0, contactCounter = 0;
@@ -11,13 +13,19 @@
 			isRecovered = r;
 		}
 
-		public static void SpreadDisease(double beta, double gamma, int howLong) {
+		public static void SpreadDisease(double beta, double gamma, double lambda, double mu, int howLong, int maxDegree) {
 			int contactTime = (int)(1 / beta), recoveryTime = (int)(1 / gamma);
+			Random rand = new Random();
 			for (int i = 0; i < 4; i++)
 				graphdata[i] = new double[howLong];
 			for (int i = 0; i < howLong; i++) {
+				if (rand.NextDouble() < lambda) society.AddNodeWithRandomEdges(maxDegree, new Hooman());	//rodzimy się
+
+				for(int a = 0; a < society.Nodes.Count; a++)
+					if (rand.NextDouble() < mu) society.RemoveNode(society.Nodes[a]);     //umieramy
+
 				foreach (Node<Hooman> hooman in society.Nodes) {
-					if (hooman.Data.isInfected) {
+					if (hooman.Data.isInfected) {								//rozprzestrzeniamy choróbska
 						hooman.Data.contactCounter++;
 						if (hooman.Data.contactCounter > contactTime) {
 							hooman.Data.contactCounter = 0;
@@ -29,7 +37,7 @@
 							}
 						}
 						hooman.Data.recoveryCounter++;
-						if (hooman.Data.recoveryCounter > recoveryTime) {
+						if (hooman.Data.recoveryCounter > recoveryTime) {		//i wychodzimy z nich zdrowi
 							hooman.Data.isInfected = false;
 							hooman.Data.isRecovered = true;
 						}

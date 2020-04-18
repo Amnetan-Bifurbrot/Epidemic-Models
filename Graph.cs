@@ -54,11 +54,11 @@ namespace Epidemic_Models {
         }
 
         public void RemoveNode(Node<T> nodeToRemove) {
-            Nodes.Remove(nodeToRemove);
-            UpdateIndices();
             foreach(Node<T> node in Nodes) {
                 RemoveEdge(node, nodeToRemove);
             }
+            Nodes.Remove(nodeToRemove);
+            UpdateIndices();
         }
 
         public void RemoveEdge(Node<T> from, Node<T> to) {
@@ -91,18 +91,41 @@ namespace Epidemic_Models {
             Nodes.ForEach(n => n.Index = i++);
         }
 
-        public void generateRandomEdges(List<Node<T>> nodes, int max) {
+        public void AddNodeWithRandomEdges(int maxDegree, T value) {
+            AddNode(value);
             Random rand = new Random();
-            int n = nodes.Count;
-            for (int i = 0; i < n; i++) {
-                int N = nodes[i].Neighbours.Count;
-                if (nodes[i].Neighbours.Count < max + 1 - N) {
-                    for (int j = 0; j < max - N; j++) {
-                        int r = rand.Next(n);
-                        Edge<T> newEdge = new Edge<T>(nodes[i], nodes[r]);
-                        if (!this.GetEdges().Contains(newEdge) && nodes[r].Neighbours.Count < max) {
-                            this.AddEdge(nodes[i], nodes[r]);
+            for (int i = 0; i < maxDegree; i++) {
+                Console.WriteLine(Nodes.Count);
+                AddEdge(Nodes[Nodes.Count], Nodes[rand.Next(1, Nodes.Count - 1)]);
+            }
+        }
+
+        public void GenerateRandomEdges(int maxDegree) {
+            int n = this.Nodes.Count, r;
+            int[] neighbors = new int[n];
+            Random rand = new Random();
+
+            bool[][] matrix = new bool[n][];
+            for (int a = 0; a < n; a++) matrix[a] = new bool[n];
+
+            for(int i = 0; i < n - 1; i++) {
+                if (neighbors[i] < maxDegree) {
+                    for (int j = 0; j < maxDegree - neighbors[i]; j++) {
+                        r = rand.Next(i + 1, n);
+                        if(neighbors[r] < maxDegree) {
+                            matrix[i][r] = matrix[r][i] = true;
+                            neighbors[i] += 1;
+                            neighbors[r] += 1;
                         }
+                    }
+                }
+            }
+
+            //teraz ich połączmy
+            for(int i = 0; i < n; i++) {
+                for(int j = 0; j < i; j++) {
+                    if (matrix[i][j]) {
+                        this.AddEdge(this.Nodes[i], this.Nodes[j]);
                     }
                 }
             }
