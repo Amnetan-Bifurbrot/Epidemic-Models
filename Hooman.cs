@@ -21,9 +21,6 @@ namespace Epidemic_Models {
 			for (int i = 0; i < howLong; i++) {
 				if (rand.NextDouble() < lambda) society.AddNodeWithRandomEdges(maxDegree, new Hooman());	//rodzimy się
 
-				for(int a = 0; a < society.Nodes.Count; a++)
-					if (rand.NextDouble() < mu) society.RemoveNode(society.Nodes[a]);     //umieramy
-
 				foreach (Node<Hooman> hooman in society.Nodes) {
 					if (hooman.Data.isInfected) {								//rozprzestrzeniamy choróbska
 						hooman.Data.contactCounter++;
@@ -43,6 +40,9 @@ namespace Epidemic_Models {
 						}
 					}
 				}
+
+				for (int a = 0; a < society.Nodes.Count; a++)
+					if (rand.NextDouble() < mu) society.RemoveNode(society.Nodes[a]);     //umieramy
 
 				//policzmy ich
 				int sAmount = 0, iAmount = 0, rAmount = 0;

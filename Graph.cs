@@ -96,7 +96,9 @@ namespace Epidemic_Models {
             Random rand = new Random();
             for (int i = 0; i < maxDegree; i++) {
                 Console.WriteLine(Nodes.Count);
-                AddEdge(Nodes[Nodes.Count], Nodes[rand.Next(1, Nodes.Count - 1)]);
+                int r = rand.Next(Nodes.Count - 1);
+                Console.WriteLine(r);
+                AddEdge(Nodes[Nodes.Count - 1], Nodes[r]);
             }
         }
 

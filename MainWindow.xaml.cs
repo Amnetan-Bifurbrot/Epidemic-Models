@@ -22,8 +22,8 @@ namespace Epidemic_Models {
         double[] yprime = new double[3];
         double beta = 0.7;    //time between contacts ^-1
         double gamma = 0.5;   //time until recovery ^-1
-        double lambda = 0.01;  //birth rate
-        double mu = 0.05;      //death rate
+        double lambda = 0.1;  //birth rate
+        double mu = 0.1;      //death rate
         //double a = 3;       //incubation period
         int N = 100, infectedN = 1;
         Graph<Hooman> graph = new Graph<Hooman>(false, false);
@@ -137,7 +137,7 @@ namespace Epidemic_Models {
                 beta = Double.Parse(betaTb.Text);
                 gamma = Double.Parse(gammaTb.Text);
 
-                Hooman.SpreadDisease(beta, gamma, lambda, mu, 100, N/20);
+                Hooman.SpreadDisease(beta, gamma, lambda, mu, 1000, N/20);
                 MakeAPlot(Solve());
 
          }
