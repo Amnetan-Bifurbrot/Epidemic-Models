@@ -3,6 +3,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -21,9 +22,9 @@ namespace Epidemic_Models {
         double[] yprime = new double[3];
         double beta = 0.7;    //time between contacts ^-1
         double gamma = 0.5;   //time until recovery ^-1
-        double lambda = 0.1;  //birth rate
-        double mu = 0.1;     //death rate
-        double xi = 0.75;     //vaccination rate
+        double lambda = 0.0; //birth rate
+        double mu = 0.0;     //death rate
+        double xi = 0.90;     //vaccination rate
         int N = 100, infectedN = 1;
         Graph<Hooman> graph = new Graph<Hooman>(false, false);
 
@@ -43,8 +44,8 @@ namespace Epidemic_Models {
 
         private double[] ODEs(double t, double[] y) {
 
-            yprime[0] = -beta * y[1] * y[0] / (N - infectedN);
-            yprime[1] = beta * y[1] * y[0] / (N - infectedN) - gamma * y[1];
+            yprime[0] = -beta * y[1] * y[0] / N;
+            yprime[1] = beta * y[1] * y[0] / N - gamma * y[1];
             yprime[2] = gamma * y[1];
 
             return yprime;
@@ -52,7 +53,7 @@ namespace Epidemic_Models {
 
         private void MakeAPlot(double[,] data) {
             var plt = new ScottPlot.Plot(1000, 800);
-            double[] x, y1, y2, y3, empX, empY1, empY2, empY3, empY4, empY5;
+            double[] x, y1, y2, y3, empX, empY1, empY2, empY3, empY4;
             int linewidth = 2, markersize = 0;
 
             x = GetColumn(data, 0);
@@ -65,7 +66,7 @@ namespace Epidemic_Models {
             empY2 = Hooman.graphdata[2];
             empY3 = Hooman.graphdata[3];
             empY4 = Hooman.graphdata[4];
-            empY5 = Hooman.graphdata[5];
+            //empY5 = Hooman.graphdata[5];
             //plt.PlotScatter(x, y1, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Green, label: "Susceptible");
             //plt.PlotScatter(x, y2, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Red, label: "Infected");
             //plt.PlotScatter(x, y3, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Blue, label: "Recovered");
@@ -74,7 +75,6 @@ namespace Epidemic_Models {
             plt.PlotScatter(empX, empY2, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Red, label: "Infected emp");
             plt.PlotScatter(empX, empY3, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Blue, label: "Recovered emp");
             plt.PlotScatter(empX, empY4, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Gray, label: "Vaccinated emp");
-            plt.PlotScatter(empX, empY5, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Black, label: "Deceased :C");
 
 
             plt.PlotAnnotation("Population: " + N + "\nβ = " + beta + "\nγ = " + gamma, 10, 10);
@@ -121,9 +121,49 @@ namespace Epidemic_Models {
             }
         }
 
-        private void NTb_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e) {
+		#region Zabezpieczenia
 
+		private void NTb_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e) {
+            Regex regex = new Regex("[^0-9]+");
+            e.Handled = regex.IsMatch(e.Text);
         }
+
+        private void infectedNTb_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e) {
+            Regex regex = new Regex("[^0-9]+");
+            e.Handled = regex.IsMatch(e.Text);
+        }
+
+        private void betaTb_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e) {
+            Regex regex = new Regex("[^0-9,]+");
+            e.Handled = regex.IsMatch(e.Text);
+        }
+
+        private void gammaTb_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e) {
+            Regex regex = new Regex("[^0-9,]+");
+            e.Handled = regex.IsMatch(e.Text);
+        }
+
+        private void lambdaTb_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e) {
+            Regex regex = new Regex("[^0-9,]+");
+            e.Handled = regex.IsMatch(e.Text);
+        }
+
+        private void muTb_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e) {
+            Regex regex = new Regex("[^0-9,]+");
+            e.Handled = regex.IsMatch(e.Text);
+        }
+
+        private void xiTb_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e) {
+            Regex regex = new Regex("[^0-9,]+");
+            e.Handled = regex.IsMatch(e.Text);
+        }
+
+        private void timeTb_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e) {
+            Regex regex = new Regex("[^0-9]+");
+            e.Handled = regex.IsMatch(e.Text);
+        }
+
+        #endregion
 
         private void Button_Click(object sender, RoutedEventArgs e) {
             graph.Nodes.Clear();
@@ -142,8 +182,11 @@ namespace Epidemic_Models {
 
             beta = Double.Parse(betaTb.Text);
             gamma = Double.Parse(gammaTb.Text);
+            lambda = Double.Parse(lambdaTb.Text);
+            mu = Double.Parse(muTb.Text);
+            xi = Double.Parse(xiTb.Text);
 
-            Hooman.SpreadDisease(beta, gamma, lambda, mu, xi, 50, N / 20);
+            Hooman.SpreadDisease(beta, gamma, lambda, mu, xi, int.Parse(timeTb.Text), N / 10);
             MakeAPlot(Solve());
 
         }
