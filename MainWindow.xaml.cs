@@ -1,4 +1,5 @@
 ﻿using DotNumerics.ODE;
+using ScottPlot;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -19,7 +20,7 @@ namespace Epidemic_Models {
         }
 
         private OdeExplicitRungeKutta45 odeRK = new OdeExplicitRungeKutta45();
-        double[] yprime = new double[3];
+        double[] yprime = new double[4];
         double beta = 0.7;    //time between contacts ^-1
         double gamma = 0.5;   //time until recovery ^-1
         double lambda = 0.0; //birth rate
@@ -32,60 +33,72 @@ namespace Epidemic_Models {
             OdeFunction fun = new OdeFunction(ODEs);
             double[] initialConditions;
             double[,] sol;
-            initialConditions = new double[3];
+            initialConditions = new double[4];
             initialConditions[0] = N - infectedN;
             initialConditions[1] = infectedN;
             initialConditions[2] = 0;
-            odeRK.InitializeODEs(fun, 3);
+            initialConditions[3] = 0;
+            odeRK.InitializeODEs(fun, 4);
             sol = odeRK.Solve(initialConditions, 0, 0.03, 20);
 
             return sol;
         }
 
         private double[] ODEs(double t, double[] y) {
-
-            yprime[0] = -beta * y[1] * y[0] / N;
-            yprime[1] = beta * y[1] * y[0] / N - gamma * y[1];
-            yprime[2] = gamma * y[1];
+            //SVIR
+            yprime[0] = lambda - mu*y[0]/4 - beta*y[0]*y[2]/N - xi*y[0];
+            yprime[1] = xi * y[0] - mu * y[1] / 4;
+            yprime[2] = beta * y[0] * y[2] / N - gamma * y[2] - mu * y[2] / 4;
+            yprime[3] = gamma * y[2] - mu*y[3] / 4;
 
             return yprime;
         }
 
         private void MakeAPlot(double[,] data) {
             var plt = new ScottPlot.Plot(1000, 800);
-            double[] x, y1, y2, y3, empX, empY1, empY2, empY3, empY4;
+            double[] x, y1, y2, y3,y4, empX, empY1, empY2, empY3, empY4;
             int linewidth = 2, markersize = 0;
 
             x = GetColumn(data, 0);
             y1 = GetColumn(data, 1);
             y2 = GetColumn(data, 2);
             y3 = GetColumn(data, 3);
+            y4 = GetColumn(data, 4);
 
             empX = Hooman.graphdata[0];
             empY1 = Hooman.graphdata[1];
             empY2 = Hooman.graphdata[2];
             empY3 = Hooman.graphdata[3];
             empY4 = Hooman.graphdata[4];
+
+            
+            int t = int.Parse(timeTb.Text) - 1;
+            tbN.Text = Convert.ToString(empY1[t] + empY2[t] + empY3[t] + empY4[t]);
             //empY5 = Hooman.graphdata[5];
-            //plt.PlotScatter(x, y1, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Green, label: "Susceptible");
-            //plt.PlotScatter(x, y2, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Red, label: "Infected");
-            //plt.PlotScatter(x, y3, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Blue, label: "Recovered");
+            plt.PlotScatter(x, y1, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Green, label: "Susceptible", lineStyle: LineStyle.Dot);
+            plt.PlotScatter(x, y2, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Red, label: "Infected", lineStyle: LineStyle.Dot);
+            plt.PlotScatter(x, y3, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Blue, label: "Recovered", lineStyle: LineStyle.Dot);
+            plt.PlotScatter(x, y4, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Gray, label: "Vaccinated", lineStyle: LineStyle.Dot);
 
             plt.PlotScatter(empX, empY1, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Green, label: "Susceptible emp");
             plt.PlotScatter(empX, empY2, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Red, label: "Infected emp");
             plt.PlotScatter(empX, empY3, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Blue, label: "Recovered emp");
             plt.PlotScatter(empX, empY4, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Gray, label: "Vaccinated emp");
 
+           
 
             plt.PlotAnnotation("Population: " + N + "\nβ = " + beta + "\nγ = " + gamma, 10, 10);
             plt.Legend();
             plt.XLabel("Time");
             plt.YLabel("Population");
 
+
+            
+
             image.Source = CreateBitmapSourceFromGdiBitmap(plt.GetBitmap());
         }
 
-        public double[] GetColumn(double[,] matrix, int columnNumber) {     // bierze kolumne z tablicy [,] - uzyte w linijce 63 i 64
+        public double[] GetColumn(double[,] matrix, int columnNumber) {     // bierze kolumne z tablicy [,] 
 
             return Enumerable.Range(0, matrix.GetLength(0))
                     .Select(x => matrix[x, columnNumber])
@@ -185,6 +198,7 @@ namespace Epidemic_Models {
             lambda = Double.Parse(lambdaTb.Text);
             mu = Double.Parse(muTb.Text);
             xi = Double.Parse(xiTb.Text);
+            Console.WriteLine("ksi" + xi);
 
             Hooman.SpreadDisease(beta, gamma, lambda, mu, xi, int.Parse(timeTb.Text), N / 10);
             MakeAPlot(Solve());
