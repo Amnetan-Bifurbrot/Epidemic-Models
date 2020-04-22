@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Epidemic_Models {
     public class Graph<T> {
@@ -97,15 +98,76 @@ namespace Epidemic_Models {
             }
         }
 
-        public void GenerateRandomEdges(int maxDegree) {
-            int n = this.Nodes.Count, r;
-            int[] neighbors = new int[n];
+        public List<double>[] GenerateRandomEdges(int maxDegree) {
+            int n = this.Nodes.Count, r, n1, n2;
+            int[] neighbors = new int[n], count = new int[n];
+            List<double> x = new List<double>();
+            List<double> y = new List<double>();
+            List<double>[] data = new List<double>[2];
+            data[0] = x;
+            data[1] = y;
+
             Random rand = new Random();
-
+            // wersja Zuzy
             bool[][] matrix = new bool[n][];
-            for (int a = 0; a < n; a++) matrix[a] = new bool[n];
+            for (int a = 0; a < n; a++) {
+                matrix[a] = new bool[n];
+                for (int b = 0; b < n; b++) {
+                    matrix[a][b] = false;
+                    Console.Write(matrix[a][b] + "\t");
+                }
+                Console.WriteLine();
+            }
 
-            for (int i = 0; i < n - 1; i++) {
+            for (int i = 0; i < n; i++) {
+                do {
+                    n1 = rand.Next(0, n);
+                } while (n1 == i || (matrix[i][n1] == true && matrix[n1][i] == true));
+                matrix[i][n1] = true;
+                matrix[n1][i] = true;
+                this.AddEdge(this.Nodes[i], this.Nodes[n1]);
+
+            }
+            Console.WriteLine();
+            for (int a = 0; a < n; a++) {
+                for (int b = 0; b < n; b++) {
+                    if (matrix[a][b] == true) {
+                        count[a] += 1;
+                    }
+                    Console.Write(matrix[a][b] + "\t");
+                }
+                Console.WriteLine();
+            }
+
+            for (int c = 0; c < n; c++) {
+                Console.WriteLine(count[c]);
+            }
+
+            //histogram 
+            count
+                .GroupBy(i => i)
+                .Select(g => new {
+                    Item = g.Key,
+                    Count = g.Count()
+
+                })
+                .OrderBy(g => g.Item)
+                .ToList()
+                .ForEach(g => {
+                    x.Add(g.Count);
+                    y.Add(g.Item);
+                    Console.WriteLine("{0} occurred {1} times", g.Item, g.Count);
+                });
+
+            for (int w = 0; w < 2; w++) {
+                foreach (int item in data[w]) {
+                    Console.Write(item + "\t");
+                }
+                Console.WriteLine();
+            }
+
+            //wersja Adama, ale tam chyba cos wczesniej bylo i zniknelo, przepraszam ;)
+            /*for (int i = 0; i < n - 1; i++) {
                 if (neighbors[i] < maxDegree) {
                     for (int j = 0; j < maxDegree - neighbors[i]; j++) {
                         r = rand.Next(i + 1, n);
@@ -125,7 +187,9 @@ namespace Epidemic_Models {
                         this.AddEdge(this.Nodes[i], this.Nodes[j]);
                     }
                 }
-            }
+            }*/
+            // returnuje bo rysuje histogram
+            return data;
         }
     }
 }

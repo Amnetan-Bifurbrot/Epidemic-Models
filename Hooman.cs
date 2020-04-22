@@ -21,14 +21,16 @@ namespace Epidemic_Models {
 			bool birth = false, death = false;
 			for (int i = 0; i < 5; i++)
 				graphdata[i] = new double[howLong];
-
+			Console.WriteLine("contact time: " + contactTime);
+			Console.WriteLine("recovery time: " + recoveryTime);
 			for (int i = 0; i < howLong; i++) {
 				sAmount = 0;
 				iAmount = 0;
 				rAmount = 0;
 				vAmount = 0;
-
-				if (stopBirthCounter == (int)((Math.Pow(10, length_b))/maxBirth)) {
+				//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%TO DZIALA I NIE WYWALIAC MI TEGO PROSZE%%%%%%%%%%%%%%%%%%%%%%%%%
+				//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%zakomentowane bo to do SVIRU%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+				/*if (stopBirthCounter == (int)((Math.Pow(10, length_b))/maxBirth)) {
 					birth = false;
 					stopBirthCounter = 0;
 					birthCounter = 0;
@@ -52,7 +54,7 @@ namespace Epidemic_Models {
 						birthCounter++;
 					}
 					stopBirthCounter++;
-				}
+				}*/
 				
 				//Console.WriteLine("stopbirthCounter: " + stopBirthCounter);
 				//Console.WriteLine();
@@ -77,7 +79,10 @@ namespace Epidemic_Models {
 					}
 				}
 
-				if (stopDeathCounter == (int)((Math.Pow(10, length_d)/maxDeath))) {
+				//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%TO DZIALA I NIE WYWALIAC MI TEGO PROSZE%%%%%%%%%%%%%%%%%%%%%%%%%
+				//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%zakomentowane bo to do SVIRU%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+				/*if (stopDeathCounter == (int)((Math.Pow(10, length_d)/maxDeath))) {
 					death = false;
 					stopDeathCounter = 0;
 					deathCounter = 0;
@@ -97,8 +102,8 @@ namespace Epidemic_Models {
 						deathCounter++;
 					}
 					stopDeathCounter++;
-				}
-				
+				}*/
+
 				//Console.WriteLine("stopdeathCounter: " + stopDeathCounter);
 				//Console.WriteLine();
 
