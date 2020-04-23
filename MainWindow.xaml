@@ -16,12 +16,12 @@
             <Label Content="Population: " HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="20,35,0,0"/>
             <Label Content="All:" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="100,27,0,0" ToolTip="Number of all humans included in simulation"/>
             <Label Content="Infected: " HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="100,50,0,0" ToolTip="Number of infected humans included in simulation"/>
-            <TextBox x:Name="NTb"  HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="180,30,0,0" Width="46" Text="100" Height="19" RenderTransformOrigin="-4.726,1.025" MaxLines="1" IsUndoEnabled="True" PreviewTextInput="NTb_PreviewTextInput"/>
-            <TextBox x:Name="infectedNTb"  HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="180,52,0,0" Width="46" Text="5" Height="19" RenderTransformOrigin="-4.726,1.025" MaxLines="1" IsUndoEnabled="True" PreviewTextInput="infectedNTb_PreviewTextInput"/>
+            <TextBox x:Name="NTb"  HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="180,30,0,0" Width="46" Text="50" Height="19" RenderTransformOrigin="-4.726,1.025" MaxLines="1" IsUndoEnabled="True" PreviewTextInput="NTb_PreviewTextInput"/>
+            <TextBox x:Name="infectedNTb"  HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="180,52,0,0" Width="46" Text="1" Height="19" RenderTransformOrigin="-4.726,1.025" MaxLines="1" IsUndoEnabled="True" PreviewTextInput="infectedNTb_PreviewTextInput"/>
             <Label Content="β: " HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="260,35,0,0" ToolTip="Average number of contacts per person in unit of time"/>
-            <TextBox x:Name="betaTb"  HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="285,35,0,0" Width="46" Text="1" Height="24" MaxLines="1" PreviewTextInput="betaTb_PreviewTextInput"/>
+            <TextBox x:Name="betaTb"  HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="285,35,0,0" Width="46" Text="0,02" Height="24" MaxLines="1" PreviewTextInput="betaTb_PreviewTextInput"/>
             <Label Content="γ:" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="360,35,0,0" Width="26" ToolTip="Number of recovered people per unit of time"/>
-            <TextBox x:Name="gammaTb"  HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="385,35,0,0" Width="46" Text="1" Height="24" MaxLines="1" PreviewTextInput="gammaTb_PreviewTextInput"/>
+            <TextBox x:Name="gammaTb"  HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="385,35,0,0" Width="46" Text="0,4" Height="24" MaxLines="1" PreviewTextInput="gammaTb_PreviewTextInput"/>
             <Button x:Name="goBtn" Content="Go!" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="911,35,0,0" Width="80" Click="Button_Click"/>
             <Label Content="Λ: " HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="455,35,0,0" ToolTip="Birth rate (0-1)"/>
             <TextBox x:Name="lambdaTb"  HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="480,35,0,0" Width="46" Text="0,01" Height="24" MaxLines="1" PreviewTextInput="lambdaTb_PreviewTextInput"/>

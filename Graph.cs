@@ -167,6 +167,7 @@ namespace Epidemic_Models {
             }
 
             //wersja Adama, ale tam chyba cos wczesniej bylo i zniknelo, przepraszam ;)
+            //gdybysmy robili dopasowanie do tych dziwnych rownan to wtedy wexmiemy Twoj model bo mamy wtedy srednie degree 
             /*for (int i = 0; i < n - 1; i++) {
                 if (neighbors[i] < maxDegree) {
                     for (int j = 0; j < maxDegree - neighbors[i]; j++) {

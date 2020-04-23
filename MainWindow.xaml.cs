@@ -39,7 +39,7 @@ namespace Epidemic_Models {
             initialConditions[0] = N - infectedN;
             initialConditions[1] = infectedN;
             initialConditions[2] = 0;
-            //initialConditions[3] = 0;
+
             odeRK.InitializeODEs(fun, 3);
             sol = odeRK.Solve(initialConditions, 0, 0.03, Convert.ToDouble(timeTb.Text));
 
@@ -52,11 +52,11 @@ namespace Epidemic_Models {
             yprime[1] = xi * y[0] - mu * y[1] / 4;
             yprime[2] = beta * y[0] * y[2] / N - gamma * y[2] - mu * y[2] / 4;
             yprime[3] = gamma * y[2] - mu*y[3] / 4;*/
-            //SIR
-            yprime[0] = -beta * y[1] * y[0] / N;
-            yprime[1] = beta * y[1] * y[0] / N - gamma * y[1] ;
+            //SIR z wikipedii
+            yprime[0] = -beta * y[1] * y[0];
+            yprime[1] = beta * y[1] * y[0]  - gamma * y[1] ;
             yprime[2] = gamma * y[1] ;
-
+          
             return yprime;
         }
 
@@ -65,11 +65,14 @@ namespace Epidemic_Models {
             double[] x, y1, y2, y3,y4, empX, empY1, empY2, empY3, empY4;
             int linewidth = 2, markersize = 0;
             double[] xx, yy;
-            x = GetColumn(data, 0);
-            y1 = GetColumn(data, 1);
-            y2 = GetColumn(data, 2);
-            y3 = GetColumn(data, 3);
-           //y4 = GetColumn(data, 4);
+             x = GetColumn(data, 0);
+             y1 = GetColumn(data, 1);
+             y2 = GetColumn(data, 2);
+             y3 = GetColumn(data, 3);
+
+           
+
+            //y4 = GetColumn(data, 4);
 
             empX = Hooman.graphdata[0];
             empY1 = Hooman.graphdata[1];
@@ -78,10 +81,10 @@ namespace Epidemic_Models {
             //empY4 = Hooman.graphdata[4];
 
             //histogram
-            xx = histogram[1].ToArray();
-            yy = histogram[0].ToArray();
+           // xx = histogram[1].ToArray();
+          //  yy = histogram[0].ToArray();
 
-            plt.PlotScatter(xx, yy, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Brown, label: "Histogram");
+           // plt.PlotScatter(xx, yy, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Brown, label: "Histogram");
 
             int t = int.Parse(timeTb.Text) - 1;
             tbN.Text = Convert.ToString(empY1[t] + empY2[t] + empY3[t]);//+ empY4[t]);
@@ -205,7 +208,7 @@ namespace Epidemic_Models {
             mu = Double.Parse(muTb.Text);
             xi = Double.Parse(xiTb.Text);
            
-            Hooman.SpreadDisease(beta, gamma, lambda, mu, xi, int.Parse(timeTb.Text), N / 10);
+            Hooman.SpreadDisease(beta, gamma, int.Parse(timeTb.Text), N / 10);
             MakeAPlot(Solve());
 
         }
