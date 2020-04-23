@@ -53,42 +53,47 @@ namespace Epidemic_Models {
             yprime[2] = beta * y[0] * y[2] / N - gamma * y[2] - mu * y[2] / 4;
             yprime[3] = gamma * y[2] - mu*y[3] / 4;*/
             //SIR z wikipedii
-            yprime[0] = -beta * y[1] * y[0];
-            yprime[1] = beta * y[1] * y[0]  - gamma * y[1] ;
-            yprime[2] = gamma * y[1] ;
-          
+            yprime[0] = -beta * y[1] * y[0] / N;
+            yprime[1] = beta * y[1] * y[0] / N - gamma * y[1];
+            yprime[2] = gamma * y[1];
+
             return yprime;
         }
 
-        private void MakeAPlot(double[,] data) {
+        private void MakeAPlot(double[,] dataEq, double[][] dataEmp) {
             var plt = new ScottPlot.Plot(1000, 800);
-            double[] x, y1, y2, y3,y4, empX, empY1, empY2, empY3, empY4;
+            double[] x, y1, y2, y3, y4, empX, empY1, empY2, empY3, empY4;
             int linewidth = 2, markersize = 0;
             double[] xx, yy;
-             x = GetColumn(data, 0);
-             y1 = GetColumn(data, 1);
-             y2 = GetColumn(data, 2);
-             y3 = GetColumn(data, 3);
+            x = GetColumn(dataEq, 0);
+            y1 = GetColumn(dataEq, 1);
+            y2 = GetColumn(dataEq, 2);
+            y3 = GetColumn(dataEq, 3);
 
-           
+
 
             //y4 = GetColumn(data, 4);
 
-            empX = Hooman.graphdata[0];
+            empX = dataEmp[0];
+            empY1 = dataEmp[1];
+            empY2 = dataEmp[2];
+            empY3 = dataEmp[3];
+
+            /*empX = Hooman.graphdata[0];
             empY1 = Hooman.graphdata[1];
             empY2 = Hooman.graphdata[2];
-            empY3 = Hooman.graphdata[3];
+            empY3 = Hooman.graphdata[3];*/
             //empY4 = Hooman.graphdata[4];
 
             //histogram
-           // xx = histogram[1].ToArray();
-          //  yy = histogram[0].ToArray();
+            // xx = histogram[1].ToArray();
+            //  yy = histogram[0].ToArray();
 
-           // plt.PlotScatter(xx, yy, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Brown, label: "Histogram");
+            // plt.PlotScatter(xx, yy, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Brown, label: "Histogram");
 
             int t = int.Parse(timeTb.Text) - 1;
             tbN.Text = Convert.ToString(empY1[t] + empY2[t] + empY3[t]);//+ empY4[t]);
-            //empY5 = Hooman.graphdata[5];
+                                                                        //empY5 = Hooman.graphdata[5];
             plt.PlotScatter(x, y1, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Green, label: "Susceptible", lineStyle: LineStyle.Dot);
             plt.PlotScatter(x, y2, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Red, label: "Infected", lineStyle: LineStyle.Dot);
             plt.PlotScatter(x, y3, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Blue, label: "Recovered", lineStyle: LineStyle.Dot);
@@ -97,7 +102,7 @@ namespace Epidemic_Models {
             plt.PlotScatter(empX, empY1, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Green, label: "Susceptible emp");
             plt.PlotScatter(empX, empY2, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Red, label: "Infected emp");
             plt.PlotScatter(empX, empY3, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Blue, label: "Recovered emp");
-           // plt.PlotScatter(empX, empY4, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Gray, label: "Vaccinated emp");
+            // plt.PlotScatter(empX, empY4, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Gray, label: "Vaccinated emp");
 
             plt.PlotAnnotation("Population: " + N + "\nβ = " + beta + "\nγ = " + gamma, 10, 10);
             plt.Legend();
@@ -143,9 +148,9 @@ namespace Epidemic_Models {
             }
         }
 
-		#region Zabezpieczenia
+        #region Zabezpieczenia
 
-		private void NTb_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e) {
+        private void NTb_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e) {
             Regex regex = new Regex("[^0-9]+");
             e.Handled = regex.IsMatch(e.Text);
         }
@@ -207,9 +212,51 @@ namespace Epidemic_Models {
             lambda = Double.Parse(lambdaTb.Text);
             mu = Double.Parse(muTb.Text);
             xi = Double.Parse(xiTb.Text);
-           
-            Hooman.SpreadDisease(beta, gamma, int.Parse(timeTb.Text), N / 10);
-            MakeAPlot(Solve());
+
+            // to kufno nie ciaua :(
+            double[][] graphdata = new double[4][];
+            double[][] data = new double[4][];
+            int howlong = int.Parse(timeTb.Text);
+            for (int i = 0; i < 4; i++)
+                data[i] = new double[howlong];
+
+            for (int l = 0; l < howlong; l++) {
+                data[0][l] = 0;
+                data[1][l] = 0;
+                data[2][l] = 0;
+                data[3][l] = 0;
+            }
+
+            for (int i = 0; i < 100; i++) {
+
+                graphdata = Hooman.SpreadDisease(beta, gamma, howlong, N / 10);
+                for (int j = 0; j < howlong; j++) {
+                    //double tmp0 = data[0][j];
+                    double tmp1 = data[1][j];
+                    double tmp2 = data[2][j];
+                    double tmp3 = data[3][j];
+
+                    data[0][j] = graphdata[0][j];
+                    data[1][j] = tmp1 + graphdata[1][j];
+                    data[2][j] = tmp2 + graphdata[2][j];
+                    data[3][j] = tmp3 + graphdata[3][j];
+                }
+
+
+            }
+            for (int k = 0; k < howlong; k++) {
+                // double tmp0 = data[0][k];
+                double tmp1 = data[1][k];
+                double tmp2 = data[2][k];
+                double tmp3 = data[3][k];
+
+                //data[0][k] = tmp0 / 100;
+                data[1][k] = tmp1 / 100;
+                data[2][k] = tmp2 / 100;
+                data[3][k] = tmp3 / 100;
+            }
+
+            MakeAPlot(Solve(), data);
 
         }
     }
