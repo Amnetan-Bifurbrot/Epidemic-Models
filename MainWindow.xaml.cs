@@ -20,7 +20,7 @@ namespace Epidemic_Models {
         }
 
         private OdeExplicitRungeKutta45 odeRK = new OdeExplicitRungeKutta45();
-        double[] yprime = new double[4];
+        double[] yprime = new double[3];
         double beta = 0.7;    //time between contacts ^-1
         double gamma = 0.5;   //time until recovery ^-1
         double lambda = 0.0; //birth rate
@@ -37,7 +37,6 @@ namespace Epidemic_Models {
             initialConditions[0] = N - infectedN;
             initialConditions[1] = infectedN;
             initialConditions[2] = 0;
-            //initialConditions[3] = 0;
             odeRK.InitializeODEs(fun, 3);
             sol = odeRK.Solve(initialConditions, 0, 0.03, double.Parse(timeTb.Text));
 
@@ -45,7 +44,7 @@ namespace Epidemic_Models {
         }
 
         private double[] ODEs(double t, double[] y) {
-            //SVIR
+            //SIR
             yprime[0] = -beta * y[0] * y[1] / N;
             yprime[1] = beta * y[0] * y[1] / N - gamma * y[1];
             yprime[2] = gamma * y[1];
@@ -70,7 +69,7 @@ namespace Epidemic_Models {
 
 
             int t = int.Parse(timeTb.Text) - 1;
-            tbN.Text = Convert.ToString(empY1[t] + empY2[t] + empY3[t]);
+            //tbN.Text = Convert.ToString(empY1[t] + empY2[t] + empY3[t]);
             plt.PlotScatter(x, y1, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Green, label: "Susceptible", lineStyle: LineStyle.Dot);
             plt.PlotScatter(x, y2, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Red, label: "Infected", lineStyle: LineStyle.Dot);
             plt.PlotScatter(x, y3, markerSize: markersize, lineWidth: linewidth, color: System.Drawing.Color.Blue, label: "Recovered", lineStyle: LineStyle.Dot);
@@ -189,7 +188,10 @@ namespace Epidemic_Models {
             mu = Double.Parse(muTb.Text);
             xi = Double.Parse(xiTb.Text);
 
+            double[,] data = new double[4, int.Parse(timeTb.Text)];
+   
             Hooman.SpreadDisease(beta, gamma, lambda, mu, xi, int.Parse(timeTb.Text), N / 10);
+         
             MakeAPlot(Solve());
 
         }
