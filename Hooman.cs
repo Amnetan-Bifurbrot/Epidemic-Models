@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace Epidemic_Models {
 	class Hooman {
 		public bool isSusceptible, isInfected, isRecovered, isVaccinated;
+		int recoveryCounter = 0, contactCounter = 0;
 		public static Graph<Hooman> society = new Graph<Hooman>(false, false);
 		public static double[][] graphdata = new double[4][];
 
@@ -14,12 +15,12 @@ namespace Epidemic_Models {
 			//isVaccinated = v;
 		}
 
-		public static double[][] SpreadDisease(double beta, double gamma, int howLong, int maxDegree) {
-			int sAmount = 0, iAmount = 0, rAmount = 0, vAmount = 0;
+		public static void SpreadDisease(double beta, double gamma, double lambda, double mu, double xi, int howLong, int maxDegree) {
+			int contactTime = (int)(1 / beta), recoveryTime = (int)(1 / gamma), sAmount = 0, iAmount = 0, rAmount = 0, vAmount = 0;
 			Random rand = new Random();
-			List<int> infectedList, healthyList, infectedListTmp;
-
-			for (int i = 0; i < 4; i++)
+			int birthCounter = 0, deathCounter = 0, maxBirth = 1, maxDeath = 1, stopBirthCounter = 0, stopDeathCounter = 0, length_b = 0, length_d = 0;
+			bool birth = false, death = false;
+			for (int i = 0; i < 5; i++)
 				graphdata[i] = new double[howLong];
 
 			for (int i = 0; i < howLong; i++) {
@@ -28,67 +29,91 @@ namespace Epidemic_Models {
 				rAmount = 0;
 				//vAmount = 0;
 
-				if (i != 0) {
-					infectedList = new List<int>(); //przechowuje indeksy chorych
-					healthyList = new List<int>();//przechowuje indeksy zdrowych
-					infectedListTmp = new List<int>();
-					// dodajemy indexy zainfekowanych osob do listy
-					// liczyymy ile zdrowych jest i ile chorych i dodajemy do list
-					foreach (Node<Hooman> hooman in society.Nodes) {
-						if (hooman.Data.isInfected == true) {
-							infectedList.Add(hooman.Index);
-							infectedListTmp.Add(hooman.Index);
-						}
-						if (hooman.Data.isSusceptible == true) {
-							healthyList.Add(hooman.Index);
-						//	Console.Write(hooman.Index + "\t");
-						}
+				if (stopBirthCounter == (int)((Math.Pow(10, length_b))/maxBirth)) {
+					birth = false;
+					stopBirthCounter = 0;
+					birthCounter = 0;
+				}
 
+				if (birth == false) {
+					string maxBirth_ = Convert.ToString(lambda);
+					length_b = maxBirth_.Length - 2;
+					maxBirth = (int)(lambda * Math.Pow(10, length_b));
+					birth = true;
+				}
+
+	
+				if (birth == true) {				
+					if (birthCounter < 1) {
+						//rodzimy się i ewentualnie szczepimy
+						if (rand.NextDouble() < xi)
+							society.AddNodeWithRandomEdges(maxDegree, new Hooman(false, false, false, true));        //narodziny + szczepienie
+						else
+							society.AddNodeWithRandomEdges(maxDegree, new Hooman());                             // narodziny bez szczepienia
+						birthCounter++;
 					}
-					//Console.WriteLine();
+					stopBirthCounter++;
+				}
+				
+				//Console.WriteLine("stopbirthCounter: " + stopBirthCounter);
+				//Console.WriteLine();
 
-					int counter = 0;
-					foreach (int index in infectedListTmp) {
-						foreach (Node<Hooman> neightbour in society.Nodes[index].Neighbours) {
-							double p = rand.NextDouble();
-							if (p < beta) {
-								neightbour.Data.isInfected = true;
-								neightbour.Data.isSusceptible = false;
-								infectedList.Add(neightbour.Index);
-								counter++;
+				foreach (Node<Hooman> hooman in society.Nodes) {
+					if (hooman.Data.isInfected) {                               //rozprzestrzeniamy choróbska
+						hooman.Data.contactCounter++;
+						if (hooman.Data.contactCounter > contactTime) {
+							hooman.Data.contactCounter = 0;
+							foreach (Node<Hooman> neighbor in hooman.Neighbours) {
+								if (neighbor.Data.isSusceptible) {
+									neighbor.Data.isSusceptible = false;
+									neighbor.Data.isInfected = true;
+								}
 							}
 						}
-					}
-					//Console.WriteLine("infectedTmp: " + infectedListTmp.Count);
-					//Console.WriteLine("infected: " + infectedList.Count);
-					//Console.WriteLine("dodam tyle: " + counter);
-
-					int counter2 = 0;
-					foreach (int index in infectedList) {
-
-						double p = rand.NextDouble();
-						if (p < gamma) {
-							society.Nodes[index].Data.isRecovered = true;
-							society.Nodes[index].Data.isInfected = false; ;
-							counter2++;
+						hooman.Data.recoveryCounter++;
+						if (hooman.Data.recoveryCounter > recoveryTime) {       //i wychodzimy z nich zdrowi (czasem)
+							hooman.Data.isInfected = false;
+							hooman.Data.isRecovered = true;
 						}
 					}
-					//Console.WriteLine("infectedTmp: " + infectedListTmp.Count);
-					//Console.WriteLine("infected: " + infectedList.Count);
-					//Console.WriteLine("dodam tyle2: " + counter2);
-
 				}
-					//policzmy ich
-					foreach (Node<Hooman> hooman in society.Nodes) {
-						if (hooman.Data.isSusceptible)
-							sAmount++;
-						else if (hooman.Data.isInfected)
-							iAmount++;
-						else if (hooman.Data.isRecovered)
-							rAmount++;
-						else
-							vAmount++;
+
+				if (stopDeathCounter == (int)((Math.Pow(10, length_d)/maxDeath))) {
+					death = false;
+					stopDeathCounter = 0;
+					deathCounter = 0;
+				}
+
+				if (death == false) {
+					string maxDeath_ = Convert.ToString(mu);
+					length_d = maxDeath_.Length - 2;
+					maxDeath = (int)(mu * Math.Pow(10, length_d));
+					death = true;
+				}
+
+				if (death == true) {
+					if (deathCounter < 1) {
+						//usmiercamy
+						society.RemoveNode(society.Nodes[rand.Next(0, society.Nodes.Count)]);
+						deathCounter++;
 					}
+					stopDeathCounter++;
+				}
+				
+				//Console.WriteLine("stopdeathCounter: " + stopDeathCounter);
+				//Console.WriteLine();
+
+				//policzmy ich
+				foreach (Node<Hooman> hooman in society.Nodes) {
+					if (hooman.Data.isSusceptible)
+						sAmount++;
+					else if (hooman.Data.isInfected)
+						iAmount++;
+					else if (hooman.Data.isRecovered)
+						rAmount++;
+					else
+						vAmount++;
+				}
 
 					graphdata[0][i] = i;        //czas
 					graphdata[1][i] = sAmount;

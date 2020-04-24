@@ -24,13 +24,13 @@
             <TextBox x:Name="gammaTb"  HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="385,35,0,0" Width="46" Text="0,4" Height="24" MaxLines="1" PreviewTextInput="gammaTb_PreviewTextInput"/>
             <Button x:Name="goBtn" Content="Go!" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="911,35,0,0" Width="80" Click="Button_Click"/>
             <Label Content="Λ: " HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="455,35,0,0" ToolTip="Birth rate (0-1)"/>
-            <TextBox x:Name="lambdaTb"  HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="480,35,0,0" Width="46" Text="0,01" Height="24" MaxLines="1" PreviewTextInput="lambdaTb_PreviewTextInput"/>
+            <TextBox x:Name="lambdaTb"  HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="480,35,0,0" Width="46" Text="0" Height="24" MaxLines="1" PreviewTextInput="lambdaTb_PreviewTextInput"/>
             <Label Content="μ: " HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="550,35,0,0" ToolTip="Death rate (0-1)"/>
-            <TextBox x:Name="muTb" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="575,35,0,0" Width="46" Text="0,01" Height="24" MaxLines="1" PreviewTextInput="muTb_PreviewTextInput"/>
+            <TextBox x:Name="muTb" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="575,35,0,0" Width="46" Text="0" Height="24" MaxLines="1" PreviewTextInput="muTb_PreviewTextInput"/>
             <Label Content="ξ: " HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="635,35,0,0" ToolTip="Vaccination rate (while being born) (0-1)"/>
             <TextBox x:Name="xiTb" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="660,35,0,0" Width="46" Text="0" Height="24" MaxLines="1" PreviewTextInput="xiTb_PreviewTextInput"/>
             <Label Content="Simulation time: " HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="720,35,0,0" ToolTip="Time of simulation (in days)"/>
-            <TextBox x:Name="timeTb" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="820,35,0,0" Width="46" Text="150" Height="24" MaxLines="1" PreviewTextInput="timeTb_PreviewTextInput"/>
+            <TextBox x:Name="timeTb" HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="820,35,0,0" Width="46" Text="25" Height="24" MaxLines="1" PreviewTextInput="timeTb_PreviewTextInput"/>
         </Grid>
         <Canvas x:Name="canvas" Margin="30,89,29.6,30.4" RenderTransformOrigin="0,0">
             <Image x:Name="image" Height="614" Canvas.Left="10" Canvas.Top="10" Width="938"/>
