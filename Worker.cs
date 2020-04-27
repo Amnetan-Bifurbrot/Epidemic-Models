@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 using System.Windows;
 
 namespace Epidemic_Models {
@@ -11,7 +6,6 @@ namespace Epidemic_Models {
 
 
         void calcWorker_DoWork(object sender, DoWorkEventArgs e) {
-
             int runs = 1000;
             for (int i = 0; i < runs; i++) {
 
@@ -21,11 +15,11 @@ namespace Epidemic_Models {
                 }
 
                 graph.Nodes.Clear();
-                
+
                 for (int n = 0; n < N - infectedN; n++) {   //zdrowe ludzie
                     graph.AddNode(new Hooman());
                 }
-                for (int m = 0; m < infectedN; m++) {   //chore ludzie
+                for (int m = 0; m < infectedN; m++) {       //chore ludzie
                     graph.AddNode(new Hooman(false, true, false));
                 }
 
@@ -39,29 +33,31 @@ namespace Epidemic_Models {
                     data[1, k] += Hooman.graphdata[1][k];
                     data[2, k] += Hooman.graphdata[2][k];
                     data[3, k] += Hooman.graphdata[3][k];
-
+                    data[4, k] += Hooman.graphdata[4][k];
                 }
                 calcWorker.ReportProgress((int)System.Math.Floor(i * 100.0 / (double)runs));
             }
-            
+
             for (int j = 0; j < data.GetLength(1); j++) {
 
                 data[1, j] = data[1, j] / runs;
                 data[2, j] = data[2, j] / runs;
                 data[3, j] = data[3, j] / runs;
+                data[4, j] = data[4, j] / runs;
             }
-
         }
 
 
         void calcWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
             pop.pgBar.Value = e.ProgressPercentage;
+            pop.pgLabel.Content = e.ProgressPercentage + "%";       //:)
         }
 
         void calcWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
             pop.Hide();
+            pop.pgBar.Value = 0;
+            pop.pgLabel.Content = "0%";
             MakeAPlot(Solve(), data);
         }
-
     }
 }
