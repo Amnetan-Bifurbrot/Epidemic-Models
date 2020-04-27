@@ -156,7 +156,7 @@ namespace Epidemic_Models {
                 ctx.DrawRectangle(vb, null, new Rect(new System.Windows.Point(), bounds.Size));
             }
             rtb.Render(dv);
-
+             
             MemoryStream stream = new MemoryStream();
             BitmapEncoder encoder = new BmpBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(rtb));
