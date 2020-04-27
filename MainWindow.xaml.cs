@@ -1,8 +1,10 @@
 ﻿using DotNumerics.ODE;
 using ScottPlot;
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -16,7 +18,6 @@ namespace Epidemic_Models {
     public partial class MainWindow : Window {
         public MainWindow() {
             InitializeComponent();
-
         }
 
         private OdeExplicitRungeKutta45 odeRK = new OdeExplicitRungeKutta45();
@@ -26,8 +27,11 @@ namespace Epidemic_Models {
         double lambda = 0.0; //birth rate
         double mu = 0.0;     //death rate
         double xi = 0.90;     //vaccination rate
-        int N = 100, infectedN = 1;
+        int N = 100, infectedN = 1, T = 0;
         Graph<Hooman> graph = new Graph<Hooman>(false, false);
+        private BackgroundWorker calcWorker = null;
+        Popup pop = new Popup();
+        double[,] data;
 
         private double[,] Solve() {
             OdeFunction fun = new OdeFunction(ODEs);
@@ -52,7 +56,7 @@ namespace Epidemic_Models {
             return yprime;
         }
 
-        private void MakeAPlot(double[,] data) {
+        private void MakeAPlot(double[,] data, double[,] dataEmp) {
             var plt = new ScottPlot.Plot(1000, 800);
             double[] x, y1, y2, y3, empX, empY1, empY2, empY3;
             int linewidth = 2, markersize = 0;
@@ -62,10 +66,16 @@ namespace Epidemic_Models {
             y2 = GetColumn(data, 2);
             y3 = GetColumn(data, 3);
 
-            empX = Hooman.graphdata[0];
+            empX = GetRow(dataEmp, 0);
+            empY1 = GetRow(dataEmp, 1);
+            empY2 = GetRow(dataEmp, 2);
+            empY3 = GetRow(dataEmp, 3);
+
+            
+            /*empX = Hooman.graphdata[0];
             empY1 = Hooman.graphdata[1];
             empY2 = Hooman.graphdata[2];
-            empY3 = Hooman.graphdata[3];
+            empY3 = Hooman.graphdata[3];*/
 
 
             int t = int.Parse(timeTb.Text) - 1;
@@ -91,6 +101,11 @@ namespace Epidemic_Models {
 
             return Enumerable.Range(0, matrix.GetLength(0))
                     .Select(x => matrix[x, columnNumber])
+                    .ToArray();
+        }
+        public double[] GetRow(double[,] matrix, int rowNumber) {
+            return Enumerable.Range(0, matrix.GetLength(1))
+                    .Select(x => matrix[rowNumber, x])
                     .ToArray();
         }
 
@@ -121,6 +136,37 @@ namespace Epidemic_Models {
             } finally {
                 bitmap.UnlockBits(bitmapData);
             }
+        }
+
+        public static Bitmap ControlToBmp(Visual target, double dpiX, double dpiY) {
+            if (target == null) {
+                return null;
+            }
+            // render control content
+            Rect bounds = VisualTreeHelper.GetDescendantBounds(target);
+            RenderTargetBitmap rtb = new RenderTargetBitmap((int)(bounds.Width * dpiX / 96.0),
+                                                            (int)(bounds.Height * dpiY / 96.0),
+                                                            dpiX,
+                                                            dpiY,
+                                                            PixelFormats.Pbgra32);
+            DrawingVisual dv = new DrawingVisual();
+            using (DrawingContext ctx = dv.RenderOpen()) {
+                VisualBrush vb = new VisualBrush(target);
+                ctx.DrawRectangle(vb, null, new Rect(new System.Windows.Point(), bounds.Size));
+            }
+            rtb.Render(dv);
+
+            MemoryStream stream = new MemoryStream();
+            BitmapEncoder encoder = new BmpBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(rtb));
+            encoder.Save(stream);
+            return new Bitmap(stream);
+        }
+
+        protected override void OnClosed(EventArgs e) {
+            base.OnClosed(e);
+            pop.Close();
+            Application.Current.Shutdown();
         }
 
         #region Zabezpieczenia
@@ -166,34 +212,59 @@ namespace Epidemic_Models {
         }
 
         #endregion
+        
+        private void SaveGraph_Click(object sender, RoutedEventArgs e) {
+            Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog();
+            dialog.FileName = "graph";
+            dialog.DefaultExt = ".png";
+            dialog.Filter = "Image files (*.png) | *.png";
+
+            // Show save file dialog box
+            Nullable<bool> result = dialog.ShowDialog();
+
+            // Process save file dialog box results
+            if (result == true) {
+                string filename = dialog.FileName;
+                ControlToBmp(image, 96, 96).Save(dialog.FileName, System.Drawing.Imaging.ImageFormat.Png);
+            } else {
+                MessageBox.Show("File Save Error.");
+            }
+        }
 
         private void Button_Click(object sender, RoutedEventArgs e) {
-            graph.Nodes.Clear();
-            N = int.Parse(NTb.Text);
-            infectedN = int.Parse(infectedNTb.Text);
-
-            for (int i = 0; i < N - infectedN; i++) {   //zdrowe ludzie
-                graph.AddNode(new Hooman());
-            }
-            for (int i = 0; i < infectedN; i++) {   //chore ludzie
-                graph.AddNode(new Hooman(false, true, false));
-            }
-
-            graph.GenerateRandomEdges(N / 20);
-            Hooman.society = graph;
-
+ 
             beta = Double.Parse(betaTb.Text);
             gamma = Double.Parse(gammaTb.Text);
             lambda = Double.Parse(lambdaTb.Text);
             mu = Double.Parse(muTb.Text);
             xi = Double.Parse(xiTb.Text);
 
-            double[,] data = new double[4, int.Parse(timeTb.Text)];
-   
-            Hooman.SpreadDisease(beta, gamma, lambda, mu, xi, int.Parse(timeTb.Text), N / 10);
-         
-            MakeAPlot(Solve());
+            data = new double[4, int.Parse(timeTb.Text)];
 
+            N = int.Parse(NTb.Text);
+            infectedN = int.Parse(infectedNTb.Text);
+            T = int.Parse(timeTb.Text);
+
+            if (null == calcWorker) {
+                calcWorker = new BackgroundWorker();
+                calcWorker.DoWork += new DoWorkEventHandler(calcWorker_DoWork);
+                calcWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(calcWorker_RunWorkerCompleted);
+                calcWorker.ProgressChanged += new ProgressChangedEventHandler(calcWorker_ProgressChanged);
+                calcWorker.WorkerReportsProgress = true;
+                calcWorker.WorkerSupportsCancellation = true;
+                pop.CancelHappened += new EventHandler(pop_CancelHappened);
+            }
+
+            pop.Show();
+            calcWorker.RunWorkerAsync();
         }
+
+        
+        void pop_CancelHappened(object sender, EventArgs e) {
+            if ((null != calcWorker) && calcWorker.IsBusy) {
+                calcWorker.CancelAsync();
+            }
+        }
+
     }
 }
